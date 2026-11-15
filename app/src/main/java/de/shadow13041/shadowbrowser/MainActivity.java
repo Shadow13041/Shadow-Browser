@@ -2,7 +2,10 @@ package de.shadow13041.shadowbrowser;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.DownloadManager;
 import android.graphics.Color;
+import android.net.Uri;
+import android.os.Environment;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.os.Build;
@@ -13,6 +16,8 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.content.Context;
 import android.webkit.WebChromeClient;
+import android.webkit.CookieManager;
+import android.webkit.URLUtil;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -263,6 +268,25 @@ public class MainActivity extends Activity {
     }
 
     private void configureWebView(WebView target) {
+        target.setDownloadListener((url, userAgent, contentDisposition, mimeType, contentLength) -> {
+            try {
+                String fileName = URLUtil.guessFileName(url, contentDisposition, mimeType);
+                DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
+                request.setTitle(fileName);
+                request.setDescription("Shadow Browser Download");
+                request.setMimeType(mimeType);
+                request.addRequestHeader("User-Agent", userAgent);
+                String cookies = CookieManager.getInstance().getCookie(url);
+                if (cookies != null) request.addRequestHeader("Cookie", cookies);
+                request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+                request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName);
+                DownloadManager manager = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
+                manager.enqueue(request);
+                Toast.makeText(this, "Download gestartet: " + fileName, Toast.LENGTH_SHORT).show();
+            } catch (Exception e) {
+                Toast.makeText(this, "Download konnte nicht gestartet werden", Toast.LENGTH_LONG).show();
+            }
+        });
         WebSettings settings = target.getSettings();
         settings.setJavaScriptEnabled(true);
         settings.setDomStorageEnabled(true);
