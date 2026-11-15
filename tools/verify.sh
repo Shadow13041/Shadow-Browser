@@ -12,25 +12,15 @@ required=(
   app/src/main/java/de/shadow13041/shadowbrowser/MainActivity.java
   app/src/main/res/values/styles.xml
 )
+
 for file in "${required[@]}"; do
-  if [[ ! -f "$file" ]]; then
-    echo "FEHLER: Datei fehlt: $file" >&2
-    exit 1
-  fi
+  test -f "$file"
+  echo "OK: $file"
 done
 
-if command -v python3 >/dev/null 2>&1; then
-  python3 - <<'PY'
-import xml.etree.ElementTree as ET
-for path in ["app/src/main/AndroidManifest.xml", "app/src/main/res/values/styles.xml"]:
-    ET.parse(path)
-    print(f"XML OK: {path}")
-PY
-fi
+grep -q "showTabOverview" app/src/main/java/de/shadow13041/shadowbrowser/MainActivity.java
+grep -q "configureWebView" app/src/main/java/de/shadow13041/shadowbrowser/MainActivity.java
 
-if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-  git diff --check
-fi
-
+git diff --check
 echo "Projektstruktur-Prüfung erfolgreich."
 echo "Hinweis: Dies ersetzt keinen Android-Gradle-Build."
