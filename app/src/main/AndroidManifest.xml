@@ -7,6 +7,7 @@
         android:label="Shadow Browser"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="false">
+        <provider android:name=".BrowserContextProvider" android:authorities="de.shadow13041.shadowbrowser.context" android:exported="true" />
         <activity
             android:name=".MainActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
