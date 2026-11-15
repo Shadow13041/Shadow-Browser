@@ -33,7 +33,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
 public class MainActivity extends Activity {
-    private static final String HOME_URL = "https://www.google.com/";
     private static final int COLOR_BACKGROUND = Color.rgb(16, 19, 26);
     private static final int COLOR_SURFACE = Color.rgb(32, 38, 50);
     private static final int COLOR_ACCENT = Color.rgb(69, 196, 255);
@@ -54,7 +53,7 @@ public class MainActivity extends Activity {
         getWindow().setStatusBarColor(COLOR_BACKGROUND);
         getWindow().setNavigationBarColor(COLOR_BACKGROUND);
         buildInterface();
-        createTab(HOME_URL);
+        createTab(BrowserSettings.getHomepage(this));
     }
 
     private void buildInterface() {
@@ -157,7 +156,7 @@ public class MainActivity extends Activity {
         });
 
         homeButton.setOnClickListener(v -> {
-            if (webView != null) webView.loadUrl(HOME_URL);
+            if (webView != null) webView.loadUrl(BrowserSettings.getHomepage(this));
         });
 
         reloadButton.setOnClickListener(v -> {
@@ -165,7 +164,7 @@ public class MainActivity extends Activity {
         });
 
         tabsButton.setOnClickListener(v -> showTabOverview());
-        newTabButton.setOnClickListener(v -> createTab(HOME_URL));
+        newTabButton.setOnClickListener(v -> createTab(BrowserSettings.getHomepage(this)));
     }
 
     private void createTab(String url) {
@@ -216,7 +215,7 @@ public class MainActivity extends Activity {
 
         if (tabs.isEmpty()) {
             webView = null;
-            createTab(HOME_URL);
+            createTab(BrowserSettings.getHomepage(this));
         } else {
             switchTab(Math.min(index, tabs.size() - 1));
         }
@@ -226,7 +225,7 @@ public class MainActivity extends Activity {
 
     private void showTabOverview() {
         if (tabs.isEmpty()) {
-            createTab(HOME_URL);
+            createTab(BrowserSettings.getHomepage(this));
             return;
         }
 
@@ -250,7 +249,7 @@ public class MainActivity extends Activity {
         new AlertDialog.Builder(this)
                 .setTitle("Open tabs (" + tabs.size() + ")")
                 .setItems(labels, (dialog, which) -> switchTab(which))
-                .setPositiveButton("New tab", (dialog, which) -> createTab(HOME_URL))
+                .setPositiveButton("New tab", (dialog, which) -> createTab(BrowserSettings.getHomepage(this)))
                 .setNegativeButton("Close current tab",
                         (dialog, which) -> closeCurrentTab())
                 .setNeutralButton("Done", null)
@@ -343,7 +342,7 @@ public class MainActivity extends Activity {
     }
 
     private void showBrowserDataMenu() {
-        String[] options = {"Aktuelle Seite speichern", "Lesezeichen anzeigen", "Verlauf anzeigen", "Downloads anzeigen", "Datenschutz"};
+        String[] options = {"Aktuelle Seite speichern", "Lesezeichen anzeigen", "Verlauf anzeigen", "Downloads anzeigen", "Datenschutz", "Einstellungen"};
         new AlertDialog.Builder(this)
                 .setTitle("Browser-Daten")
                 .setItems(options, (dialog, which) -> {
@@ -360,6 +359,8 @@ public class MainActivity extends Activity {
                         DownloadDialogs.show(this);
                     } else if (which == 4) {
                         PrivacyDialogs.show(this, webView);
+                    } else if (which == 5) {
+                        SettingsDialogs.show(this);
                     }
                 }).show();
     }
@@ -377,8 +378,7 @@ public class MainActivity extends Activity {
             target = "https://" + input;
         } else {
             try {
-                target = "https://www.google.com/search?q="
-                        + URLEncoder.encode(input, StandardCharsets.UTF_8.name());
+                target = BrowserSettings.buildSearchUrl(this, input);
             } catch (Exception exception) {
                 Toast.makeText(this, "Search could not be started",
                         Toast.LENGTH_SHORT).show();
