@@ -342,7 +342,7 @@ public class MainActivity extends Activity {
     }
 
     private void showBrowserDataMenu() {
-        String[] options = {"Aktuelle Seite speichern", "Lesezeichen anzeigen", "Verlauf anzeigen", "Downloads anzeigen", "Datenschutz", "Einstellungen"};
+        String[] options = {"Aktuelle Seite speichern", "Lesezeichen anzeigen", "Verlauf anzeigen", "Downloads anzeigen", "Datenschutz", "Einstellungen", "Auf Seite suchen"};
         new AlertDialog.Builder(this)
                 .setTitle("Browser-Daten")
                 .setItems(options, (dialog, which) -> {
@@ -361,6 +361,8 @@ public class MainActivity extends Activity {
                         PrivacyDialogs.show(this, webView);
                     } else if (which == 5) {
                         SettingsDialogs.show(this);
+                    } else if (which == 6) {
+                        FindInPageDialog.show(this, webView);
                     }
                 }).show();
     }
