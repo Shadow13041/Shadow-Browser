@@ -4,6 +4,7 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
 git rev-parse --is-inside-work-tree >/dev/null
+git remote set-url origin "https://Shadow13041@github.com/Shadow13041/Shadow-Browser.git"
 ./tools/verify.sh
 
 git add -A
