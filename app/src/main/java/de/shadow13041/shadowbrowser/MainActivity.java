@@ -296,13 +296,15 @@ public class MainActivity extends Activity {
         settings.setBuiltInZoomControls(true);
         settings.setDisplayZoomControls(false);
         settings.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
+        android.webkit.CookieManager.getInstance().setAcceptThirdPartyCookies(
+                target, !PrivacySettings.blockThirdPartyCookies(this));
         settings.setAllowFileAccess(false);
         settings.setAllowContentAccess(false);
         settings.setJavaScriptCanOpenWindowsAutomatically(false);
         settings.setSupportMultipleWindows(false);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            settings.setSafeBrowsingEnabled(true);
+            settings.setSafeBrowsingEnabled(PrivacySettings.safeBrowsing(this));
         }
 
         android.webkit.CookieManager.getInstance()
