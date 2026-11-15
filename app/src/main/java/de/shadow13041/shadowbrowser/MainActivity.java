@@ -67,6 +67,10 @@ public class MainActivity extends Activity {
             showBrowserDataMenu();
             return true;
         });
+        addressBar.setOnLongClickListener(v -> {
+            showBrowserDataMenu();
+            return true;
+        });
         addressBar.setSingleLine(true);
         addressBar.setTextColor(Color.WHITE);
         addressBar.setHintTextColor(Color.rgb(168, 178, 194));
@@ -292,6 +296,7 @@ public class MainActivity extends Activity {
             @Override
             public void onPageFinished(WebView view, String url) {
                 if (url != null) BrowserDataStore.addHistory(MainActivity.this, url, view.getTitle());
+                if (url != null) BrowserDataStore.addHistory(MainActivity.this, url, view.getTitle());
                 if (view == webView) {
                     addressBar.setText(url);
                     updateNavigationButtons();
@@ -316,6 +321,28 @@ public class MainActivity extends Activity {
                 }
             }
         });
+    }
+
+    private void showBrowserDataMenu() {
+        String[] options = {"Aktuelle Seite speichern", "Lesezeichen anzeigen", "Verlauf anzeigen"};
+        new AlertDialog.Builder(this)
+                .setTitle("Browser-Daten")
+                .setItems(options, (dialog, which) -> {
+                    if (which == 0) {
+                        if (webView != null) {
+                            String url = webView.getUrl();
+                            String title = webView.getTitle();
+                            if (url != null) {
+                                BrowserDataStore.addBookmark(this, url, title);
+                                Toast.makeText(this, "Lesezeichen gespeichert", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    } else if (which == 1) {
+                        BrowserDataDialogs.show(this, webView, false);
+                    } else {
+                        BrowserDataDialogs.show(this, webView, true);
+                    }
+                }).show();
     }
 
     private void showBrowserDataMenu() {
